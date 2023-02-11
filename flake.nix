@@ -42,8 +42,6 @@
 
           installPhase =
             ''
-              mkdir -p $out/share/pandoc
-              cp -r $src/templates/defaults $out/share/pandoc
               mkdir -p $out/bin
               cp $src/hello-flake $out/bin/hello-flake
               chmod +x $out/bin/hello-flake
