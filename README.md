@@ -1,6 +1,7 @@
 # hello-flake
 
-simple flake test
+A very simple demonstration using nix flakes.
+This package contains a single executable that prints a greeting.
 
 ## Running the executable
 
