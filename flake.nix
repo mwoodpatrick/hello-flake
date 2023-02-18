@@ -3,7 +3,7 @@
 
   # Nixpkgs / NixOS version to use.
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-21.05";
+    nixpkgs.url = "nixpkgs/nixos-22.11";
   };
 
   outputs = { self, nixpkgs }:
@@ -52,13 +52,9 @@
 
       # Provide some binary packages for selected system types.
       packages = forAllSystems (system:
-        {
+        rec {
           inherit (nixpkgsFor.${system}) hello-flake;
+          default = hello-flake;
         });
-
-      # The default package for 'nix build'. This makes sense if the
-      # flake provides only one package or there is a clear "main"
-      # package.
-      defaultPackages.default = forAllSystems (system: self.packages.${system}.hello-flake);
     };
 }
