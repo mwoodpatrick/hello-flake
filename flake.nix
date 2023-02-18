@@ -60,5 +60,6 @@
       # flake provides only one package or there is a clear "main"
       # package.
       defaultPackages.default = forAllSystems (system: self.packages.${system}.hello-flake);
+      defaultPackage = defaultPackages.default;
     };
 }
