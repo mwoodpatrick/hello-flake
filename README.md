@@ -17,10 +17,6 @@ To run a specific branch and revision, use the command below.
 
     nix run "git+https://codeberg.org/mhwombat/hello-flake?ref=main&rev=d44728bce88a6f9d1d37dbf4720ece455e997606"
 
-You can also abbreviate the revision.
-
-    nix run "git+https://codeberg.org/mhwombat/hello-flake?ref=main&rev=d44728bce8"
-
 ## Launching a shell
 
 To get a shell with this package available, use the command below.
