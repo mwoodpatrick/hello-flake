@@ -1,60 +1,47 @@
 {
   description = "a very simple and friendly flake";
 
-  # Nixpkgs / NixOS version to use.
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-22.11";
+    nixpkgs.url = "github:NixOS/nixpkgs";
+    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs }:
-    let
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        # to work with older version of flakes
+        lastModifiedDate = self.lastModifiedDate or self.lastModified or "19700101";
 
-      # to work with older version of flakes
-      lastModifiedDate = self.lastModifiedDate or self.lastModified or "19700101";
+        # Generate a user-friendly version number.
+        version = builtins.substring 0 8 lastModifiedDate;
 
-      # Generate a user-friendly version number.
-      version = builtins.substring 0 8 lastModifiedDate;
+        pkgs = import nixpkgs { inherit system; };
+      in
+      {
+        packages = rec {
+          hello = pkgs.stdenv.mkDerivation rec {
+            name = "hello-flake-${version}";
 
-      # System types to support.
-      supportedSystems = [ "x86_64-linux" "x86_64-darwin" "aarch64-linux" "aarch64-darwin" ];
+            src = ./.;
 
-      # Helper function to generate an attrset '{ x86_64-linux = f "x86_64-linux"; ... }'.
-      forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
+            unpackPhase = "true";
 
-      # Nixpkgs instantiated for supported system types.
-      nixpkgsFor = forAllSystems (system: import nixpkgs { inherit system; overlays = [ self.overlay ]; });
+            buildPhase = ":";
 
-    in
-
-    {
-
-      # A Nixpkgs overlay.
-      overlay = final: prev: {
-
-        hello-flake = with final; stdenv.mkDerivation rec {
-          name = "hello-flake-${version}";
-
-          src = ./.;
-
-          unpackPhase = "true";
-
-          buildPhase = ":";
-
-          installPhase =
-            ''
-              mkdir -p $out/bin
-              cp $src/hello-flake $out/bin/hello-flake
-              chmod +x $out/bin/hello-flake
-            '';
+            installPhase =
+              ''
+                mkdir -p $out/bin
+                cp $src/hello-flake $out/bin/hello-flake
+                chmod +x $out/bin/hello-flake
+              '';
+          };
+          default = hello;
         };
 
-      };
-
-      # Provide some binary packages for selected system types.
-      packages = forAllSystems (system:
-        rec {
-          inherit (nixpkgsFor.${system}) hello-flake;
-          default = hello-flake;
-        });
-    };
+        apps = rec {
+          hello = flake-utils.lib.mkApp { drv = self.packages.${system}.hello; };
+          default = hello;
+        };
+      }
+    );
 }
