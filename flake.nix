@@ -15,6 +15,12 @@
         pkgs = import nixpkgs { inherit system; };
       in
       {
+        devShells = rec {
+          default = pkgs.mkShell {
+            packages = [ pkgs.cowsay ];
+          };
+        };
+
         packages = rec {
           hello = pkgs.stdenv.mkDerivation rec {
             name = "hello-flake";
